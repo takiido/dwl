@@ -117,8 +117,9 @@ static const  enum libinput_config_tap_button_map button_map                = LI
  * =                              =
  * ================================
  */
-static const char *termcmd[] = { "foot", NULL };
-static const char *menucmd[] = { "bemenu-run", NULL };
+static const char *termcmd[]        = { "foot", NULL };
+static const char *menucmd[]        = { "bemenu-run", NULL };
+static const char *screenshotcmd[]  = { "grim -g '$(slurp -d)' - | wl-copy", NULL};
 
 
 /* ================================
@@ -143,6 +144,9 @@ static const Key keys[] = {
   /* apps */
 	{ MODKEY,                    XKB_KEY_space,       spawn,            {.v = menucmd} },
 	{ MODKEY,                    XKB_KEY_Return,      spawn,            {.v = termcmd} },
+
+  /* screenshot */
+  { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_s,           spawn,            {.v = screenshotcmd} },
 
   /* windows size/focus */
 	{ MODKEY,                    XKB_KEY_j,           focusstack,       {.i = +1} },
