@@ -42,9 +42,13 @@ static int log_level = WLR_ERROR;
  * ================================
  */
 static const Rule rules[] = {
-	/* app_id             title       tags mask     isfloating   monitor */
-	{ "Gimp_EXAMPLE",     NULL,       0,            1,           -1     },
-	{ "firefox_EXAMPLE",  NULL,       1 << 8,       0,           -1     },
+	/* app_id    title       tags mask    isfloating    monitor    x    y */
+  { "foot", "popup",            0,           1,            -1,        -2,  -2 },
+  
+  { NULL, "Picture-in-Picture", 0,           1,            -1,        -2,  -2 },
+
+  { NULL, "Steam Settings",     0,           1,            -1,        -2,  -2 },
+  { NULL, "Friends List",       0,           1,            -1,        -2,  -2 },
 };
 
 
@@ -117,9 +121,14 @@ static const  enum libinput_config_tap_button_map button_map                = LI
  * =                              =
  * ================================
  */
-static const char *termcmd[]        = { "foot", NULL };
-static const char *menucmd[]        = { "bemenu-run", NULL };
-static const char *screenshotcmd[]  = { "grim -g '$(slurp -d)' - | wl-copy", NULL};
+static const char *termcmd[]          = { "foot", NULL };
+static const char *menucmd[]          = { "/home/takiido/repos/dots/scripts/bemenu-run.sh", NULL };
+static const char *screenshotcmd[]    = { "grim -g '$(slurp -d)' - | wl-copy", NULL};
+static const char *brightness_up[]    = { "brightnessctl", "set", "+10%", NULL };
+static const char *brightness_down[]  = { "brightnessctl", "set", "10%-", NULL };
+static const char *volume_up[]        = { "wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%+", NULL };
+static const char *volume_down[]      = { "wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%-", NULL };
+static const char *volume_mute[]      = { "wpctl", "set-mute",   "@DEFAULT_AUDIO_SINK@", "toggle", NULL };
 
 
 /* ================================
@@ -142,42 +151,56 @@ static const Key keys[] = {
 	/* modifier                  key                  function          argument */
 
   /* apps */
-	{ MODKEY,                    XKB_KEY_space,       spawn,            {.v = menucmd} },
-	{ MODKEY,                    XKB_KEY_Return,      spawn,            {.v = termcmd} },
+	{ MODKEY,                    XKB_KEY_space,                 spawn,            {.v = menucmd} },
+	{ MODKEY,                    XKB_KEY_Return,                spawn,            {.v = termcmd} },
 
   /* screenshot */
-  { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_s,           spawn,            {.v = screenshotcmd} },
+  { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_s,                     spawn,            {.v = screenshotcmd} },
 
   /* windows size/focus */
-	{ MODKEY,                    XKB_KEY_j,           focusstack,       {.i = +1} },
-	{ MODKEY,                    XKB_KEY_k,           focusstack,       {.i = -1} },
-	{ MODKEY,                    XKB_KEY_i,           incnmaster,       {.i = +1} },
-	{ MODKEY,                    XKB_KEY_d,           incnmaster,       {.i = -1} },
-	{ MODKEY,                    XKB_KEY_h,           setmfact,         {.f = -0.05f} },
-	{ MODKEY,                    XKB_KEY_l,           setmfact,         {.f = +0.05f} },
+	{ MODKEY,                    XKB_KEY_j,                     focusstack,       {.i = +1} },
+	{ MODKEY,                    XKB_KEY_k,                     focusstack,       {.i = -1} },
+	{ MODKEY,                    XKB_KEY_i,                     incnmaster,       {.i = +1} },
+	{ MODKEY,                    XKB_KEY_d,                     incnmaster,       {.i = -1} },
+	{ MODKEY,                    XKB_KEY_h,                     setmfact,         {.f = -0.05f} },
+	{ MODKEY,                    XKB_KEY_l,                     setmfact,         {.f = +0.05f} },
 
 
-	{ MODKEY,                    XKB_KEY_z,           zoom,             {0} },
-	{ MODKEY,                    XKB_KEY_Tab,         view,             {0} },
-  { MODKEY,                    XKB_KEY_g,           togglegaps,       {0} },
+	{ MODKEY,                    XKB_KEY_z,                     zoom,             {0} },
+	{ MODKEY,                    XKB_KEY_Tab,                   view,             {0} },
+  { MODKEY,                    XKB_KEY_g,                     togglegaps,       {0} },
+
+  /* special keys */
+  {0,                          XKB_KEY_XF86MonBrightnessUp,   spawn,            {.v = brightness_up} },
+  {0,                          XKB_KEY_XF86MonBrightnessDown, spawn,            {.v = brightness_down} },
+
+  {0,                          XKB_KEY_XF86AudioRaiseVolume,  spawn,            {.v = volume_up} },
+  {0,                          XKB_KEY_XF86AudioLowerVolume,  spawn,            {.v = volume_down} },
+  {0,                          XKB_KEY_XF86AudioMute,         spawn,            {.v = volume_mute} },
+
+  {0,                          XKB_KEY_XF86MonBrightnessUp,   spawn,            {.v = brightness_up} },
+  {0,                          XKB_KEY_XF86MonBrightnessDown, spawn,            {.v = brightness_down} },
+
+
 
   /* kill window */
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_c,           killclient,       {0} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_c,                     killclient,       {0} },
 
   /* layouts */
-	{ MODKEY,                    XKB_KEY_t,           setlayout,        {.v = &layouts[0]} },
-	{ MODKEY,                    XKB_KEY_f,           setlayout,        {.v = &layouts[1]} },
-	{ MODKEY,                    XKB_KEY_m,           setlayout,        {.v = &layouts[2]} },
+	{ MODKEY,                    XKB_KEY_t,                     setlayout,        {.v = &layouts[0]} },
+	{ MODKEY,                    XKB_KEY_f,                     setlayout,        {.v = &layouts[1]} },
+	{ MODKEY,                    XKB_KEY_m,                     setlayout,        {.v = &layouts[2]} },
 
-	{ MODKEY,                    XKB_KEY_Home,        setlayout,        {0} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_f,           togglefloating,   {0} },
-	{ MODKEY,                    XKB_KEY_e,           togglefullscreen, {0} },
-	{ MODKEY,                    XKB_KEY_0,           view,             {.ui = ~0} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_parenright,  tag,              {.ui = ~0} },
-	{ MODKEY,                    XKB_KEY_comma,       focusmon,         {.i = WLR_DIRECTION_LEFT} },
-	{ MODKEY,                    XKB_KEY_period,      focusmon,         {.i = WLR_DIRECTION_RIGHT} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_less,        tagmon,           {.i = WLR_DIRECTION_LEFT} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_greater,     tagmon,           {.i = WLR_DIRECTION_RIGHT} },
+	{ MODKEY,                    XKB_KEY_Home,                  setlayout,        {0} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_f,                     togglefloating,   {0} },
+	{ MODKEY,                    XKB_KEY_e,                     togglefullscreen, {0} },
+	{ MODKEY,                    XKB_KEY_0,                     view,             {.ui = ~0} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_parenright,            tag,              {.ui = ~0} },
+	{ MODKEY,                    XKB_KEY_comma,                 focusmon,         {.i = WLR_DIRECTION_LEFT} },
+	{ MODKEY,                    XKB_KEY_period,                focusmon,         {.i = WLR_DIRECTION_RIGHT} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_less,                  tagmon,           {.i = WLR_DIRECTION_LEFT} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_greater,               tagmon,           {.i = WLR_DIRECTION_RIGHT} },
+
 	TAGKEYS(          XKB_KEY_1, XKB_KEY_exclam,                        0),
 	TAGKEYS(          XKB_KEY_2, XKB_KEY_at,                            1),
 	TAGKEYS(          XKB_KEY_3, XKB_KEY_numbersign,                    2),
@@ -187,7 +210,7 @@ static const Key keys[] = {
 	TAGKEYS(          XKB_KEY_7, XKB_KEY_ampersand,                     6),
 	TAGKEYS(          XKB_KEY_8, XKB_KEY_asterisk,                      7),
 	TAGKEYS(          XKB_KEY_9, XKB_KEY_parenleft,                     8),
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_q,           quit,             {0} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_q,                     quit,            {0} },
 
 	/* Ctrl-Alt-Backspace and Ctrl-Alt-Fx used to be handled by X server */
 	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,XKB_KEY_Terminate_Server, quit, {0} },

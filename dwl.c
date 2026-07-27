@@ -229,6 +229,7 @@ typedef struct {
 	uint32_t tags;
 	int isfloating;
 	int monitor;
+  int x, y;/* position on the screen */
 } Rule;
 
 typedef struct {
@@ -476,31 +477,48 @@ applybounds(Client *c, struct wlr_box *bbox)
 }
 
 void
+centerwindow(Client *c, Monitor *m)
+{
+  if (!c || !m)
+    return;
+
+  c->geom.x = m->m.x + (m->m.width - c->geom.width) / 2;
+  c->geom.y = m->m.y + (m->m.height - c->geom.height) / 2;
+}
+
+void
 applyrules(Client *c)
 {
-	/* rule matching */
 	const char *appid, *title;
 	uint32_t newtags = 0;
 	int i;
 	const Rule *r;
 	Monitor *mon = selmon, *m;
-
 	appid = client_get_appid(c);
 	title = client_get_title(c);
-
 	for (r = rules; r < END(rules); r++) {
 		if ((!r->title || strstr(title, r->title))
 				&& (!r->id || strstr(appid, r->id))) {
-			c->isfloating = r->isfloating;
+
 			newtags |= r->tags;
 			i = 0;
 			wl_list_for_each(m, &mons, link) {
 				if (r->monitor == i++)
 					mon = m;
 			}
+
+			if (r->isfloating) {
+				c->isfloating = 1;
+				if (r->x == -2 && r->y == -2) {
+					centerwindow(c, mon);
+				}
+				if (r->x != -1 && r->y != -1) {
+					c->geom.x = r->x;
+					c->geom.y = r->y;
+				}
+			}
 		}
 	}
-
 	c->isfloating |= client_is_float_type(c);
 	setmon(c, mon, newtags);
 }
