@@ -77,6 +77,7 @@ static const MonitorRule monrules[] = {
 	/* name       mfact  nmaster scale  layout       rotate/reflect                x    y */
 	{ "eDP-1",    0.6f,  1,      2,     &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL,   -1,  -1 },
   { "HDMI-A-1", 0.6f,  1,      1,     &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL,   -1,  -1 },
+  { "ED270R",   0.6f,  1,      1,     &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL,   -1,  1920 },
 	{ NULL,       0.55f, 1,      1,     &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL,   -1,  -1 },
 };
 
@@ -123,13 +124,13 @@ static const  enum libinput_config_tap_button_map button_map                = LI
  */
 static const char *termcmd[]          = { "foot", NULL };
 static const char *menucmd[]          = { "/home/takiido/repos/dots/scripts/bemenu-run.sh", NULL };
-static const char *screenshotcmd[]    = { "grim -g '$(slurp -d)' - | wl-copy", NULL};
+static const char *screenshotcmd[]    = { "/bin/sh", "-c", "grim -g \"$(slurp -d)\" - | wl-copy", NULL };
 static const char *brightness_up[]    = { "brightnessctl", "set", "+10%", NULL };
 static const char *brightness_down[]  = { "brightnessctl", "set", "10%-", NULL };
 static const char *volume_up[]        = { "wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%+", NULL };
 static const char *volume_down[]      = { "wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%-", NULL };
 static const char *volume_mute[]      = { "wpctl", "set-mute",   "@DEFAULT_AUDIO_SINK@", "toggle", NULL };
-
+static const char *kb_brightness[]    = { "/home/takiido/repos/dots/scripts/kb_brightness.sh", NULL };
 
 /* ================================
  * =                              =
@@ -180,8 +181,7 @@ static const Key keys[] = {
 
   {0,                          XKB_KEY_XF86MonBrightnessUp,   spawn,            {.v = brightness_up} },
   {0,                          XKB_KEY_XF86MonBrightnessDown, spawn,            {.v = brightness_down} },
-
-
+  {0,                          XKB_KEY_XF86KbdLightOnOff,     spawn,            {.v = kb_brightness} },
 
   /* kill window */
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_c,                     killclient,       {0} },
